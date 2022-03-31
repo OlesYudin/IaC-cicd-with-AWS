@@ -61,6 +61,6 @@ resource "aws_cloudwatch_event_target" "cloudwatch-event-target-codebuild" {
       "build-status" = "$.detail.build-status"
       "project-name" = "$.detail.project-name"
     }
-    input_template = "\"Your project (<project-name>) in <region> region, at '<time>' was run with <build-status> status\""
+    input_template = "\"Your project <project-name> in <region> region, at '<time>' was run with <build-status> status\""
   }
 }
