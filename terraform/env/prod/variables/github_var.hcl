@@ -4,7 +4,7 @@ locals {
     # Owner of github account
     github_owner = "OlesYudin"
     # Default github url repository
-    github_url = "https://github.com/OlesYudin/final_demo"
+    github_url = "https://github.com/OlesYudin/demo_4"
     # Default path to buildspec.yml
     buildspec = "terraform/env/prod/buildspec.yml"
     # Default branch where will aplly some commit 
