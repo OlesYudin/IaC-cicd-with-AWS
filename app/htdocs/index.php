@@ -13,6 +13,7 @@
 		<header>
 			<div class="title">
 				<h1>Generation of pseudo-random passwords!</h1>
+				<h1>Generation of pseudo-random passwords!</h1>
 				<p>
 				Generation of pseudo-random passwords based on entropy operating system based on the Linux kernel
 				</p>
