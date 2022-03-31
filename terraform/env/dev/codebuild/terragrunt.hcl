@@ -13,11 +13,17 @@ dependency "ecr" {
     registry_url = "000000000000.dkr.ecr.us-east-2.amazonaws.com/image"
   }
 }
-
 # Get outputs from module CLUSTER
 dependency "cluster" {
   config_path = "../cluster"
   mock_outputs = {
+    # Network
+    vpc_id = "vpc-000000000000"
+    subnets_id = [
+      "subnet-11111111111111111", 
+      "subnet-22222222222222222"
+    ]
+    # ECS
     task_definition_family = "task-definition-family"
     task_definition_cluster = "task-definition-cluster"
     task_definition_service = "task-definition-service"
@@ -52,6 +58,10 @@ inputs = {
   account_id              = dependency.ecr.outputs.account_id                  # Get account ID
   registry_url            = dependency.ecr.outputs.registry_url                # ECR registy URL
   
+  # Network variables
+  vpc_id = dependency.cluster.outputs.vpc_id # VPC id
+  subnets_id = dependency.cluster.outputs.subnets_id # Subnets is (Lis of subnets)
+
   # ECS variables
   task_definition_family  = dependency.cluster.outputs.task_definition_family  # Name of task definition 
   task_definition_cluster = dependency.cluster.outputs.task_definition_cluster # Name of ECS cluster
