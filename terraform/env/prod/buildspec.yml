@@ -1,0 +1,65 @@
+version: 0.2
+
+env:
+  variables:
+    APP_NAME: "password-generator"
+    ENV: "prod"
+    TF_VERSION: "1.1.7"
+    TG_VERSION: "0.36.6"
+
+phases:
+  install:
+    commands:
+      # Install terraform
+      - cd /usr/local/bin
+      - curl -s -qL -o terraform.zip https://releases.hashicorp.com/terraform/${TF_VERSION}/terraform_${TF_VERSION}_linux_amd64.zip
+      - unzip -o terraform.zip
+      - chmod +x terraform
+      - curl -sSL https://github.com/gruntwork-io/terragrunt/releases/download/v${TG_VERSION}/terragrunt_linux_amd64 -o terragrunt
+      - chmod +x terragrunt
+  pre_build:
+    commands:
+      # Add environment
+      - REPOSITORY_URI=${ECR_APP_URL}
+      - ECR_IMAGE="{REPOSITORY_URI}:${CODEBUILD_RESOLVED_SOURCE_VERSION}"
+      - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
+      # Get current time in Ukraine
+      - TIMESTAMP=$(TZ="Europe/Zaporozhye" date +"%d.%m.%y_%H.%M")
+      # This tag based on your env, hash of github commit and current time in Ukraine
+      # Example: prod-a3bae24-21.03.22_13.26
+      - IMAGE_TAG=${ENV}-${COMMIT_HASH:=latest-codebuild}-${TIMESTAMP}
+
+      # Login to AWS
+      - aws ecr get-login-password --region ${AWS_REGION} | docker login --username AWS --password-stdin ${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_REGION}.amazonaws.com
+      # Build docker image 
+      - docker build -t $REPOSITORY_URI:latest "$CODEBUILD_SRC_DIR"/app
+      - docker build -t $REPOSITORY_URI:$IMAGE_TAG "$CODEBUILD_SRC_DIR"/app
+      # Push docker image to AWS
+      - docker push $REPOSITORY_URI:latest
+      - docker push $REPOSITORY_URI:$IMAGE_TAG
+  build:
+    commands:
+      # Update ECS cluster
+      # Describe task definition
+      - TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition "$TASK_DEFINITION_FAMILY" --region "$AWS_REGION")
+      # Remove useless data from task definitions:
+      # 1. taskDefinitionArn
+      # 2. revision
+      # 3. status
+      # 4. requiresAttributes
+      # 5. compatibilities
+      # 6. registeredAt - if dont delete this will be crash
+      # 7. registeredBy - if dont delete this will be crash
+      - NEW_TASK_DEFINTIION=$(echo $TASK_DEFINITION | jq --arg IMAGE "image:tag" '.taskDefinition | .containerDefinitions[0].image = $IMAGE | del(.taskDefinitionArn) | del(.revision) | del(.status) | del(.requiresAttributes) | del(.compatibilities) | del(.registeredAt) | del(.registeredBy)')
+      # Register new task definition
+      - NEW_TASK_INFO=$(aws ecs register-task-definition --region "$AWS_REGION" --cli-input-json "$NEW_TASK_DEFINTIION")
+      # Output number of revision for task definition
+      - NEW_REVISION=$(echo $NEW_TASK_INFO | jq '.taskDefinition.revision')
+      # Update ECS task-definition with new docker image tag
+      - aws ecs update-service --cluster ${TASK_DEFINITION_CLUSTER} --service ${TASK_DEFINITION_SERVICE} --task-definition ${TASK_DEFINITION_FAMILY}:${NEW_REVISION}
+  post_build:
+    commands:
+      # Run terragrunt for updating Infrastructure
+      - cd "$CODEBUILD_SRC_DIR"/terraform/env/prod
+      - terragrunt plan --terragrunt-working-dir cluster/ -var="image_tag=${IMAGE_TAG}" 
+      - terragrunt apply --terragrunt-working-dir cluster/ -var="image_tag=${IMAGE_TAG}" -auto-approve
