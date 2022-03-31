@@ -5,7 +5,7 @@ resource "aws_codebuild_project" "password-generator-codebuild-plan" {
   build_timeout = "5"
   service_role  = aws_iam_role.codebuild-iam-role.arn
 
-  # Артефакты, которые можно хранить в S3 bucket в качестве архива. 
+  # Артефакты, которые можно хранить в S3 bucket в качестве архива 
   artifacts {
     type = "NO_ARTIFACTS"
   }
@@ -58,7 +58,13 @@ resource "aws_codebuild_project" "password-generator-codebuild-plan" {
 
     report_build_status = "true" # Whether to report the status of a build's start and finish to your source provider.
   }
-  #source_version = var.github_source_brance
+
+  vpc_config {
+    vpc_id             = var.vpc_id
+    subnets            = var.subnets_id
+    security_group_ids = [aws_security_group.codebuild.id]
+  }
+
   tags = {
     Environment = var.env
   }
@@ -89,21 +95,7 @@ resource "aws_codebuild_webhook" "password-generator-webhook" {
     }
   }
 }
-# resource "github_repository_webhook" "example" {
-#   active     = true
-#   events     = ["push"]
-#   name       = "example"
-#   repository = var.github_url
-
-#   configuration {
-#     url          = aws_codebuild_webhook.password-generator-webhook.payload_url
-#     secret       = aws_codebuild_webhook.password-generator-webhook.secret
-#     content_type = "json"
-#     insecure_ssl = false
-#   }
-# }
-
-
+# Create resource for store secrets (GitHub OAuthToken)
 resource "aws_ssm_parameter" "ssm-github-auth" {
   name        = "GitHubAuth-${var.app_name}-${var.env}"
   description = "Github token for codebuild auth"
@@ -115,7 +107,7 @@ resource "aws_ssm_parameter" "ssm-github-auth" {
     env  = var.env
   }
 }
-
+# Connect Auth token to CodeBuild
 resource "aws_codebuild_source_credential" "github-auth-credential" {
   auth_type   = "PERSONAL_ACCESS_TOKEN"
   server_type = "GITHUB"

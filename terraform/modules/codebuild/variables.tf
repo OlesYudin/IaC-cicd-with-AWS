@@ -52,18 +52,59 @@ variable "github_trigger_path" {
   description = "Default path where will be do changes"
   type        = string
 }
-
-
 # Codebuild
 variable "buildspec" {
   description = "Buildspec.yml path"
   type        = string
 }
-variable "account_id" {}              # Get AWS account id
-variable "registry_url" {}            # ECR Registri URL
-variable "task_definition_family" {}  # Name of task definition family
-variable "task_definition_cluster" {} # Name of task definition cluster
-variable "task_definition_service" {} # Name of task definition service
-variable "s3_arn_codebuild" {}        # Name of s3 for codebuild
+
+
+# Variables from another modules
+# ECR module
+# Get AWS account id
+variable "account_id" {
+  description = "AWS account ID"
+  type        = string
+}
+# ECR Registri URL
+variable "registry_url" {
+  description = "Default ECR registry URL"
+  type        = string
+}
+
+# Clustem module (Network)
+# VPC id
+variable "vpc_id" {
+  description = "Default VPC id from Network module"
+  type        = string
+}
+# Private subnet id (list of subnets)
+variable "subnets_id" {
+  description = "Default list of subnets id from Network module"
+  type        = list(any)
+}
+# Cluster module (ECS)
+# Name of task definition family
+variable "task_definition_family" {
+  description = "Name of task definition"
+  type        = string
+}
+# Name of task definition cluster
+variable "task_definition_cluster" {
+  description = "Name of ECS cluster"
+  type        = string
+}
+# Name of task definition service
+variable "task_definition_service" {
+  description = "Name of ECS service"
+  type        = string
+}
+
+# s3 module
+# Name of s3 for codebuild
+variable "s3_arn_codebuild" {
+  description = "Name of s3 bucket"
+  type        = string
+}
 
 
