@@ -51,9 +51,9 @@ resource "aws_ecs_service" "password-generator" {
   desired_count = var.ecs_desired_count
 
   network_configuration {
-    subnets          = aws_subnet.public_subnet.*.id
+    subnets          = aws_subnet.private_subnet.*.id
     security_groups  = [aws_security_group.sg_ecs_alb.id]
-    assign_public_ip = true
+    assign_public_ip = false # IF true it will assign public ip, use it if you havent NAT
   }
 
   load_balancer {
