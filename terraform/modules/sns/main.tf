@@ -7,7 +7,7 @@ resource "aws_sns_topic" "sns_topic_codebuild" {
 {
   "http": {
     "defaultHealthyRetryPolicy": {
-      "numRetries": 3,
+      "numRetries": 10,
       "numNoDelayRetries": 0,
       "minDelayTarget": 20,
       "maxDelayTarget": 20,
@@ -61,6 +61,6 @@ resource "aws_cloudwatch_event_target" "cloudwatch-event-target-codebuild" {
       "build-status" = "$.detail.build-status"
       "project-name" = "$.detail.project-name"
     }
-    input_template = "\"Codebuild status:\\n\\nProject: <project-name>\\nRegion: <region>\\nTime: <time>\\n\\nBuild status: <build-status>\""
+    input_template = "\"Codebuild status:\n\nProject: <project-name>\nRegion: <region>\nTime: <time>\n\nBuild status: <build-status>\""
   }
 }
