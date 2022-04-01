@@ -8,7 +8,8 @@ variable "app_name" {
   description = "Default application name"
   type        = string
 }
-# env
+# Default environments
 variable "env" {
-  type = string
+  description = "Default environment"
+  type        = string
 }
