@@ -10,6 +10,7 @@ dependency "ecr" {
   # Get outputs from module ECR
   mock_outputs = {
     account_id = "000000000000"
+    registry_url = "0000000000000.dkr.ecr.region.amazonaws.com/app"
   }
 }
 locals {
@@ -22,6 +23,7 @@ inputs = {
   image_tag = local.app_var.locals.image_tag
   app_working_dir = local.app_var.locals.app_working_dir
   account_id = dependency.ecr.outputs.account_id # Get account ID
+  registry_url = dependency.ecr.outputs.registry_url
 }
 
 # This module depends on ECR

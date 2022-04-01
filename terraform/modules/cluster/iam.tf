@@ -1,10 +1,10 @@
 # IAM Role
 # TODO:Rewtire using own policy
 resource "aws_iam_role" "ecs-ecr-iam-role" {
-  name               = "${var.app_name}-ecs-ecr-iam-role"
+  name               = "${var.app_name}-${var.env}-ecs-ecr-iam-role"
   assume_role_policy = data.aws_iam_policy_document.ecs_role_policy.json
   tags = {
-    Name = "${var.app_name}-ecs-iam-role"
+    Name = "${var.app_name}-${var.env}-ecs-iam-role"
   }
 }
 
