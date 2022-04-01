@@ -8,5 +8,5 @@ docker build -t ${account_id}.dkr.ecr.${region}.amazonaws.com/${app_name}:latest
 docker build -t ${account_id}.dkr.ecr.${region}.amazonaws.com/${app_name}:${image_tag} .
 
 # Push container to AWS
-docker push ${account_id}.dkr.ecr.${region}.amazonaws.com/${app_name}:latest
-docker push ${account_id}.dkr.ecr.${region}.amazonaws.com/${app_name}:${image_tag}
+docker push ${account_id}.dkr.ecr.${region}.amazonaws.com/${registry_url}:latest
+docker push ${account_id}.dkr.ecr.${region}.amazonaws.com/${registry_url}:${image_tag}

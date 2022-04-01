@@ -29,3 +29,7 @@ variable "account_id" {
   description = "Repository id in ECR"
   type        = string
 }
+
+variable "registry_url" {
+  type = string
+}
