@@ -1,6 +1,6 @@
 # Codebuild IAM
 resource "aws_iam_role" "codebuild-iam-role" {
-  name               = "${var.app_name}-${var.app_name}-codebuild-iam-role"
+  name               = "${var.app_name}-${var.env}-codebuild-iam-role"
   assume_role_policy = data.aws_iam_policy_document.codebuild_role_policy.json
   tags = {
     Name = "${var.app_name}-${var.env}-codebuild-iam-role"

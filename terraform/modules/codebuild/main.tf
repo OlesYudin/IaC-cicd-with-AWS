@@ -1,9 +1,10 @@
 # CodeBuild Project
 resource "aws_codebuild_project" "password-generator-codebuild-plan" {
-  name          = "Password-generator-${var.env}-codebuild-plan"
-  description   = "CodeBuild project for password generator application"
-  build_timeout = "5"
-  service_role  = aws_iam_role.codebuild-iam-role.arn
+  name                   = "Password-generator-${var.env}-codebuild-plan"
+  description            = "CodeBuild project for password generator application"
+  build_timeout          = "5"
+  service_role           = aws_iam_role.codebuild-iam-role.arn
+  concurrent_build_limit = 1 # Run only 1 build (Cant run 2 ore more build in case of 2 or more commit)
 
   # Артефакты, которые можно хранить в S3 bucket в качестве архива 
   artifacts {

@@ -1,6 +1,6 @@
 # Security group for ALB
 resource "aws_security_group" "sg_ecs_alb" {
-  name        = "SG-HTTP"
+  name        = "SG-HTTP-${var.env}"
   description = "Security group for ALB and ECS"
   vpc_id      = aws_vpc.vpc.id
 
